@@ -1,0 +1,6 @@
+{
+  "name": "Agent Pay",
+  "description": "Bengali MFS Agent App to approve player deposit and withdraw requests and earn commissions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

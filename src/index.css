@@ -1,0 +1,287 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #f1f5f9 !important; /* Soft slate/light gray mode */
+    color: #1e293b !important; /* Deep charcoal text */
+  }
+}
+
+/* 1. Core Background Overrides */
+.bg-slate-950,
+.bg-\[\#0d131f\]\/95,
+body {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+header.bg-slate-900,
+.bg-slate-900,
+.bg-slate-850,
+.bg-slate-800,
+.bg-\[\#111827\]\/40,
+.bg-\[\#111827\]\/45,
+.bg-\[\#111827\]\/30,
+.bg-\[\#1f2937\]\/20,
+.bg-slate-950\/40,
+.bg-slate-900\/60,
+.bg-slate-950\/60,
+.bg-slate-950\/80,
+.bg-slate-900\/80,
+.bg-\[\#1e1b4b\]\/30,
+.bg-\[\#1f2937\]\/50,
+.bg-indigo-950\/20,
+.bg-slate-900\/70,
+#notifications-portal-box,
+#verified-agent-header-profile-card {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Overriding shadow borders for premium feel */
+.bg-slate-900, .bg-\[\#111827\]\/40, .bg-\[\#111827\]\/45, .bg-\[\#111827\]\/30, #verified-agent-header-profile-card {
+  box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.06), 0 2px 8px -2px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* 2. Text colors mapping to rich charcoal */
+.text-white,
+h1, h2, h3, h4, h5, h6,
+.text-slate-100,
+.text-slate-150,
+.text-slate-200,
+.text-slate-205,
+.text-slate-300,
+.text-slate-350 {
+  color: #0f172a !important; /* Deep contrast dark gray */
+}
+
+/* Dim text color replacements */
+.text-slate-400,
+.text-slate-500,
+.text-slate-450 {
+  color: #576071 !important; /* Muted corporate blue-gray */
+}
+
+/* 3. Inputs, selects, textareas */
+input, select, textarea, select option {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+input::placeholder {
+  color: #64748b !important;
+}
+input:focus, select:focus {
+  border-color: #3b82f6 !important;
+  --tw-ring-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+/* 3. Borders */
+.border,
+.border-slate-800,
+.border-slate-850,
+.border-slate-900,
+.border-slate-800\/80,
+.border-slate-850\/50,
+.border-slate-900\/80,
+.border-slate-800\/85 {
+  border-color: #e2e8f0 !important;
+}
+
+/* 4. Sticky Navigation Bar (Glassmorphism look) */
+#mobile-persistent-bottom-navbar {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top-color: #e2e8f0 !important;
+  box-shadow: 0 -4px 12px -2px rgba(0, 0, 0, 0.03) !important;
+}
+#mobile-persistent-bottom-navbar button {
+  color: #64748b !important;
+}
+#mobile-persistent-bottom-navbar button.text-rose-500 {
+  color: #f43f5e !important;
+}
+
+/* 5. Quick actions grids styling */
+.group .bg-rose-950\/20 {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+  border-color: rgba(244, 63, 94, 0.25) !important;
+}
+.group .text-rose-400 {
+  color: #e11d48 !important;
+}
+.group .bg-emerald-950\/20 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+.group .text-emerald-400 {
+  color: #059669 !important;
+}
+.group .bg-sky-950\/20, .group .bg-\[\#0088cc\]\/10 {
+  background-color: rgba(14, 165, 233, 0.12) !important;
+  border-color: rgba(14, 165, 233, 0.25) !important;
+}
+.group .text-sky-400 {
+  color: #0284c7 !important;
+}
+.group .bg-purple-950\/20 {
+  background-color: rgba(168, 85, 247, 0.12) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+.group .text-purple-400 {
+  color: #7933e5 !important;
+}
+.group .bg-indigo-950\/20 {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+  border-color: rgba(99, 102, 241, 0.25) !important;
+}
+.group .text-indigo-400 {
+  color: #4338ca !important;
+}
+.group .bg-amber-950\/20 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+.group .text-amber-400 {
+  color: #b45309 !important;
+}
+.group .bg-teal-950\/20 {
+  background-color: rgba(20, 184, 166, 0.12) !important;
+  border-color: rgba(20, 184, 166, 0.25) !important;
+}
+.group .text-teal-400 {
+  color: #0f766e !important;
+}
+.group .bg-fuchsia-950\/20 {
+  background-color: rgba(217, 70, 239, 0.12) !important;
+  border-color: rgba(217, 70, 239, 0.25) !important;
+}
+.group .text-fuchsia-400 {
+  color: #a21caf !important;
+}
+.group .bg-orange-950\/20 {
+  background-color: rgba(249, 115, 22, 0.12) !important;
+  border-color: rgba(249, 115, 22, 0.25) !important;
+}
+.group .text-orange-400 {
+  color: #c2410c !important;
+}
+
+/* Adjust mini tag badges inside quick menu */
+.group .text-rose-300 { color: #be123c !important; }
+.group .bg-rose-500\/10 { background-color: rgba(244, 63, 94, 0.12) !important; border-color: rgba(244, 63, 94, 0.25) !important; }
+
+.group .text-emerald-300 { color: #047857 !important; }
+.group .bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.12) !important; border-color: rgba(16, 185, 129, 0.25) !important; }
+
+.group .text-sky-300 { color: #0369a1 !important; }
+.group .bg-sky-500\/10 { background-color: rgba(14, 165, 233, 0.12) !important; border-color: rgba(14, 165, 233, 0.25) !important; }
+
+.group .text-purple-300 { color: #5b21b6 !important; }
+.group .bg-purple-500\/10 { background-color: rgba(168, 85, 247, 0.12) !important; border-color: rgba(168, 85, 247, 0.25) !important; }
+
+.group .text-indigo-300 { color: #3730a3 !important; }
+.group .bg-indigo-500\/10 { background-color: rgba(99, 102, 241, 0.12) !important; border-color: rgba(99, 102, 241, 0.25) !important; }
+
+.group .text-amber-300 { color: #92400e !important; }
+.group .bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.12) !important; border-color: rgba(245, 158, 11, 0.25) !important; }
+
+.group .text-teal-300 { color: #115e59 !important; }
+.group .bg-teal-500\/10 { background-color: rgba(20, 184, 166, 0.12) !important; border-color: rgba(20, 184, 166, 0.25) !important; }
+
+.group .text-fuchsia-300 { color: #701a75 !important; }
+.group .bg-fuchsia-500\/10 { background-color: rgba(217, 70, 239, 0.12) !important; border-color: rgba(217, 70, 239, 0.25) !important; }
+
+.group .text-orange-300 { color: #9a3412 !important; }
+.group .bg-orange-500\/10 { background-color: rgba(249, 115, 22, 0.12) !important; border-color: rgba(249, 115, 22, 0.25) !important; }
+
+.group .bg-\[\#0088cc\]\/15 { background-color: rgba(0, 136, 204, 0.12) !important; border-color: rgba(0, 136, 204, 0.25) !important; }
+
+/* 6. Preservation of colored backgrounds / buttons *and their text contents* */
+button.bg-rose-500,
+button.bg-rose-600,
+button.bg-emerald-500,
+button.bg-emerald-600,
+button.bg-teal-500,
+button.bg-gradient-to-r,
+button.bg-blue-600,
+button.bg-indigo-600,
+a.bg-gradient-to-r,
+.bg-rose-600,
+.bg-rose-500,
+.bg-[#10b981],
+.bg-emerald-500,
+.bg-emerald-600,
+.bg-pink-600,
+.bg-orange-600,
+.bg-violet-600,
+.bg-cyan-500,
+.bg-indigo-500,
+.bg-teal-500,
+.bg-indigo-600,
+.bg-red-500 {
+  color: #ffffff !important;
+}
+
+button.bg-rose-500 *, 
+button.bg-rose-600 *, 
+button.bg-emerald-500 *, 
+button.bg-emerald-600 *, 
+button.bg-teal-500 *, 
+button.bg-gradient-to-r *, 
+button.bg-blue-600 *, 
+button.bg-indigo-600 *, 
+a.bg-gradient-to-r *, 
+.bg-rose-500 *, 
+.bg-rose-600 *, 
+.bg-\[\#10b981\] *, 
+.bg-emerald-500 *, 
+.bg-emerald-600 *, 
+.bg-pink-600 *, 
+.bg-orange-600 *, 
+.bg-violet-600 *, 
+.bg-[#10b981] *,
+.bg-[#0088cc] *,
+.bg-[#0088cc] {
+  color: #ffffff !important;
+}
+
+/* Specific text fixes for high contrast on light backgrounds */
+.text-cyan-400 {
+  color: #0891b2 !important; /* cyan-600 for contrast */
+}
+.text-purple-400 {
+  color: #7c3aed !important; /* purple-600 for contrast */
+}
+.text-rose-400, .text-rose-500 {
+  color: #e11d48 !important; /* rose-600 */
+}
+.text-emerald-400, .text-emerald-500 {
+  color: #059669 !important; /* emerald-600 */
+}
+.text-amber-400 {
+  color: #d97706 !important; /* amber-600 */
+}
+.bg-rose-500\/10 {
+  background-color: rgba(244, 63, 94, 0.08) !important;
+}
+.bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+/* Modals overlays to look premium */
+.fixed.inset-0.bg-slate-950\/80 {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Status dots */
+span.absolute.bg-\[\#10b981\] {
+  background-color: #10b981 !important;
+  border-color: #ffffff !important;
+}
+

@@ -117,7 +117,15 @@ export const initialPlayerRequests: PlayerRequest[] = [
   createPlayerRequest('deposit', 300, 4),
   createPlayerRequest('deposit', 200, 5),
   createPlayerRequest('deposit', 100, 6),
-  // 2 Withdrawals
-  createPlayerRequest('withdraw', 1500, 7),
-  createPlayerRequest('withdraw', 1000, 8)
+  // 10 Withdrawals (Requested by user: 3 of 500, 4 of 1000, 3 of 1500)
+  createPlayerRequest('withdraw', 500, 7),
+  createPlayerRequest('withdraw', 500, 8),
+  createPlayerRequest('withdraw', 500, 9),
+  createPlayerRequest('withdraw', 1000, 10),
+  createPlayerRequest('withdraw', 1000, 11),
+  createPlayerRequest('withdraw', 1000, 12),
+  createPlayerRequest('withdraw', 1000, 13),
+  createPlayerRequest('withdraw', 1500, 14),
+  createPlayerRequest('withdraw', 1500, 15),
+  createPlayerRequest('withdraw', 1500, 16)
 ];

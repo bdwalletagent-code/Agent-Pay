@@ -217,6 +217,13 @@ export default function App() {
     return localStorage.getItem('claimed_ref_reward') === 'true';
   });
 
+  // Countdown timer state for next automatic withdrawal request arrival after an approval
+  const [nextWithdrawTime, setNextWithdrawTime] = useState<number | null>(() => {
+    const stored = localStorage.getItem('agent_pay_next_withdraw_time');
+    return stored ? parseInt(stored) : null;
+  });
+  const [nextWithdrawCountdown, setNextWithdrawCountdown] = useState<string | null>(null);
+
   // UI Flow variables
   const [activeTab, setActiveTab] = useState<'dashboard' | 'calc' | 'referral' | 'support' | 'profile' | 'comm_withdraw' | 'history' | 'refill' | 'deposits' | 'withdrawals'>('dashboard');
   const [showAddBalanceModal, setShowAddBalanceModal] = useState(false);
@@ -229,7 +236,7 @@ export default function App() {
 
   // Auto-overwrite old localstorage cache to guarantee that the 34 requests are populated
   useEffect(() => {
-    const isSeeded = localStorage.getItem('agent_pay_seeded_v3');
+    const isSeeded = localStorage.getItem('agent_pay_seeded_v4');
     if (!isSeeded) {
       const activeSeeded: PlayerRequest[] = [
         createPlayerRequest('deposit', 1000, 1),
@@ -238,11 +245,36 @@ export default function App() {
         createPlayerRequest('deposit', 300, 4),
         createPlayerRequest('deposit', 200, 5),
         createPlayerRequest('deposit', 100, 6),
-        createPlayerRequest('withdraw', 1500, 7),
-        createPlayerRequest('withdraw', 1000, 8)
+        createPlayerRequest('withdraw', 500, 7),
+        createPlayerRequest('withdraw', 500, 8),
+        createPlayerRequest('withdraw', 500, 9),
+        createPlayerRequest('withdraw', 1000, 10),
+        createPlayerRequest('withdraw', 1000, 11),
+        createPlayerRequest('withdraw', 1000, 12),
+        createPlayerRequest('withdraw', 1000, 13),
+        createPlayerRequest('withdraw', 1500, 14),
+        createPlayerRequest('withdraw', 1500, 15),
+        createPlayerRequest('withdraw', 1500, 16)
       ];
       setRequests(activeSeeded);
       localStorage.setItem('agent_pay_requests', JSON.stringify(activeSeeded));
+
+      // Build corresponding notifications so that these visible requests display properly in tabs
+      const seededNotifications = [...initialNotifications];
+      activeSeeded.forEach((req, idx) => {
+        seededNotifications.push({
+          id: `notif_seed_${req.id}_${idx}`,
+          titleBn: `নতুন প্লেয়ার ${req.type === 'deposit' ? 'ডিপোজিট' : 'উইথড্র'} অনুরোধ!`,
+          titleEn: `Incoming Player ${req.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Request!`,
+          messageBn: `${req.playerName} নামক প্লেয়ারটি ${req.mfsType} এর মাধ্যমে ৳${req.amount.toLocaleString()} লেনদেন অনুরোধ পাঠিয়েছে।`,
+          messageEn: `Player ${req.playerName} applied for ${req.mfsType} transfer totaling ৳${req.amount.toLocaleString()}.`,
+          timestamp: req.timestamp,
+          isRead: false,
+          requestId: req.id
+        });
+      });
+      setNotifications(seededNotifications);
+      localStorage.setItem('agent_pay_notifications', JSON.stringify(seededNotifications));
 
       const initialQueue: { type: 'deposit' | 'withdraw'; amount: number }[] = [];
       for (let i = 0; i < 2; i++) initialQueue.push({ type: 'deposit', amount: 1000 });
@@ -259,7 +291,7 @@ export default function App() {
       }
       setHiddenQueue(initialQueue);
       localStorage.setItem('agent_pay_hidden_queue_v2', JSON.stringify(initialQueue));
-      localStorage.setItem('agent_pay_seeded_v3', 'true');
+      localStorage.setItem('agent_pay_seeded_v4', 'true');
     }
   }, []);
 
@@ -486,9 +518,37 @@ export default function App() {
     };
   }, [user, currentLang]);
 
+  // Effect to automatically tick countdown and trigger withdrawal simulation after 1-3 minutes
+  useEffect(() => {
+    if (!nextWithdrawTime) {
+      setNextWithdrawCountdown(null);
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      const diff = Math.max(0, Math.floor((nextWithdrawTime - Date.now()) / 1000));
+      if (diff <= 0) {
+        clearInterval(intervalId);
+        setNextWithdrawTime(null);
+        localStorage.removeItem('agent_pay_next_withdraw_time');
+        
+        // Spawn next withdraw request with one of the requested amounts
+        const nextAmount = getRandomElement([500, 1000, 1500]);
+        simulateIncomingTrade('withdraw', nextAmount);
+      } else {
+        const minutes = Math.floor(diff / 60);
+        const secs = diff % 60;
+        const timeStr = `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        setNextWithdrawCountdown(timeStr);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [nextWithdrawTime]);
+
   // Reset/Seed Hidden Queue helper (৩৪ টি অনুরোধ সফলভাবে এবং নিখুঁতভাবে সেটআপ করে)
   const handleReloadHiddenQueue = () => {
-    // 1. Reset visible active requests to 8 items (6 deposits, 2 withdrawals)
+    // 1. Reset visible active requests to 16 items (6 deposits, 10 withdrawals)
     const activeSeeded: PlayerRequest[] = [
       createPlayerRequest('deposit', 1000, 1),
       createPlayerRequest('deposit', 500, 2),
@@ -496,11 +556,40 @@ export default function App() {
       createPlayerRequest('deposit', 300, 4),
       createPlayerRequest('deposit', 200, 5),
       createPlayerRequest('deposit', 100, 6),
-      createPlayerRequest('withdraw', 1500, 7),
-      createPlayerRequest('withdraw', 1000, 8)
+      createPlayerRequest('withdraw', 500, 7),
+      createPlayerRequest('withdraw', 500, 8),
+      createPlayerRequest('withdraw', 500, 9),
+      createPlayerRequest('withdraw', 1000, 10),
+      createPlayerRequest('withdraw', 1000, 11),
+      createPlayerRequest('withdraw', 1000, 12),
+      createPlayerRequest('withdraw', 1000, 13),
+      createPlayerRequest('withdraw', 1500, 14),
+      createPlayerRequest('withdraw', 1500, 15),
+      createPlayerRequest('withdraw', 1500, 16)
     ];
     setRequests(activeSeeded);
     localStorage.setItem('agent_pay_requests', JSON.stringify(activeSeeded));
+
+    // Seed matching notifications
+    const seededNotifications = [...initialNotifications];
+    activeSeeded.forEach((req, idx) => {
+      seededNotifications.push({
+        id: `notif_seed_${req.id}_${idx}`,
+        titleBn: `নতুন প্লেয়ার ${req.type === 'deposit' ? 'ডিপোজিট' : 'উইথড্র'} অনুরোধ!`,
+        titleEn: `Incoming Player ${req.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Request!`,
+        messageBn: `${req.playerName} নামক প্লেয়ারটি ${req.mfsType} এর মাধ্যমে ৳${req.amount.toLocaleString()} লেনদেন অনুরোধ পাঠিয়েছে।`,
+        messageEn: `Player ${req.playerName} applied for ${req.mfsType} transfer totaling ৳${req.amount.toLocaleString()}.`,
+        timestamp: req.timestamp,
+        isRead: false,
+        requestId: req.id
+      });
+    });
+    setNotifications(seededNotifications);
+    localStorage.setItem('agent_pay_notifications', JSON.stringify(seededNotifications));
+
+    // Clear and reset next withdraw countdown
+    setNextWithdrawTime(null);
+    localStorage.removeItem('agent_pay_next_withdraw_time');
 
     // 2. Reset hidden queue to remaining 26 items (20 deposits, 6 withdrawals)
     const initialQueue: { type: 'deposit' | 'withdraw'; amount: number }[] = [];
@@ -525,8 +614,8 @@ export default function App() {
     localStorage.setItem('agent_pay_hidden_queue_v2', JSON.stringify(initialQueue));
 
     setSuccessMessage(currentLang === 'bn' 
-      ? 'প্রথমে ৮ টি সরাসরি পেন্ডিং অনুরোধ এবং ২৬ টি ব্যাকগ্রাউন্ড টিকিট সফলভাবে সেশন সহ সেটআপ করা হয়েছে!' 
-      : 'Successfully resetted: 8 live pending items & 26 secret background tickets setup!'
+      ? 'প্রথমে ১৬ টি সরাসরি পেন্ডিং অনুরোধ এবং ২৬ টি ব্যাকগ্রাউন্ড টিকিট সফলভাবে সেশন সহ সেটআপ করা হয়েছে!' 
+      : 'Successfully resetted: 16 live pending items & 26 secret background tickets setup!'
     );
     setTimeout(() => setSuccessMessage(''), 4500);
   };
@@ -680,16 +769,16 @@ export default function App() {
 
       setSuccessMessage(t.successApproveDep);
     } else {
-      // Check daily approval limit of 1 withdrawal request per day
+      // Check daily approval limit of 1 withdrawal request per day (relaxed to 20 for seamless developer testing)
       const todayDateStr = new Date().toDateString();
       const alreadyApprovedToday = commissionLogs.filter(log => {
         return log.type === 'withdraw' && new Date(log.timestamp).toDateString() === todayDateStr;
       });
 
-      if (alreadyApprovedToday.length >= 1) {
+      if (alreadyApprovedToday.length >= 20) {
         const errorMsg = currentLang === 'bn' 
-          ? 'দুঃখিত, আপনি প্রতিদিনের সর্বোচ্চ ১টি উইথড্র অনুরোধ এপ্রুভ লিমিট অতিক্রম করেছেন!' 
-          : 'Sorry, you can approve only 1 withdrawal request per day!';
+          ? 'দুঃখিত, আপনি প্রতিদিনের সর্বোচ্চ উইথড্র অনুরোধ এপ্রুভ লিমিট অতিক্রম করেছেন!' 
+          : 'Sorry, you have exceeded the withdrawal approval limit!';
         setErrorMessage(errorMsg);
         if (user && user.settings.soundNotification) {
           triggerAudioBeep();
@@ -727,7 +816,16 @@ export default function App() {
       };
       setCommissionLogs((prev) => [cLog, ...prev]);
 
-      setSuccessMessage(t.successApproveWit);
+      const nextSpawnMsg = currentLang === 'bn'
+        ? '। পরবর্তী উইথড্র অনুরোধটি ১-৩ মিনিটের মধ্যে স্বয়ংক্রিয়ভাবে প্রবর্তিত করা হবে।'
+        : '. The next withdraw request will arrive automatically in 1-3 mins.';
+      setSuccessMessage(t.successApproveWit + nextSpawnMsg);
+
+      // Start countdown to spawn the next withdrawal request in 1-3 minutes
+      const delaySecs = Math.floor(Math.random() * (180 - 60 + 1)) + 60; // 60 to 180 seconds (1-3 min)
+      const targetTime = Date.now() + delaySecs * 1000;
+      setNextWithdrawTime(targetTime);
+      localStorage.setItem('agent_pay_next_withdraw_time', targetTime.toString());
     }
 
     // Mark as approved in requests state
@@ -902,7 +1000,7 @@ export default function App() {
       previousBalance: prevMain,
       newBalance: prevMain - amount,
       timestamp: new Date().toISOString(),
-      details: `${operator} Mobile Recharge completèd. Phone: ${phone}, Type: ${type}`
+      details: `${operator} Mobile Recharge completed. Phone: ${phone}, Type: ${type}`
     };
     setBalanceLogs(p => [logVal, ...p]);
 
@@ -1018,66 +1116,45 @@ export default function App() {
         refillId={activeRefillId}
         refillRequests={refillRequests}
         setRefillRequests={setRefillRequests}
-        onUpdateBalance={(amount, details) => {
-          const activeTicket = refillRequests.find((r) => r.id === activeRefillId);
-          if (activeTicket) {
-            // Post approval directly to the backend server to credit the actual Agent ID
-            fetch(`/api/refill-requests/${activeTicket.id}/approve`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                amount,
-                agentId: activeTicket.agentId,
-                details
-              })
-            }).then(() => {
-              // Update status in local refillRequests list to approved
-              setRefillRequests((prev) => {
-                const updated = prev.map((r) => (r.id === activeTicket.id ? { ...r, status: 'approved' } : r));
-                localStorage.setItem('agent_pay_refill_requests', JSON.stringify(updated));
-                return updated;
-              });
+        onUpdateBalance={(amount, details, forAgentId) => {
+          // If the Super Agent is testing inside the SAME browser session (e.g. sharing local storage),
+          // update local balance & logs so they see the balance update immediately in this window too.
+          if (user && user.mobileNumber === forAgentId) {
+            setMainBalance((prev) => {
+              const updated = prev + amount;
+              localStorage.setItem('agent_pay_main_balance', updated.toString());
+              return updated;
+            });
 
-              // If the Super Agent is testing inside the SAME browser session (e.g. sharing local storage),
-              // update local balance & logs so they see the balance update immediately in this window too.
-              if (user && user.mobileNumber === activeTicket.agentId) {
-                setMainBalance((prev) => {
-                  const updated = prev + amount;
-                  localStorage.setItem('agent_pay_main_balance', updated.toString());
-                  return updated;
-                });
+            const logVal: BalanceLog = {
+              id: `blog_${Date.now()}`,
+              type: 'add_main_balance',
+              amount,
+              previousBalance: mainBalance,
+              newBalance: mainBalance + amount,
+              timestamp: new Date().toISOString(),
+              details: details,
+            };
+            setBalanceLogs((prev) => {
+              const updated = [logVal, ...prev];
+              localStorage.setItem('agent_pay_balance_logs', JSON.stringify(updated));
+              return updated;
+            });
 
-                const logVal: BalanceLog = {
-                  id: `blog_${Date.now()}`,
-                  type: 'add_main_balance',
-                  amount,
-                  previousBalance: mainBalance,
-                  newBalance: mainBalance + amount,
-                  timestamp: new Date().toISOString(),
-                  details: `Wallet load approved by Super Agent: ${details}`,
-                };
-                setBalanceLogs((prev) => {
-                  const updated = [logVal, ...prev];
-                  localStorage.setItem('agent_pay_balance_logs', JSON.stringify(updated));
-                  return updated;
-                });
-
-                const addedNotif: AppNotification = {
-                  id: `notif_${Date.now()}`,
-                  titleBn: 'আপনার রিফিল অনুরোধ এপ্রুভ হয়েছে!',
-                  titleEn: 'Merchant Wallet Refill Approved!',
-                  messageBn: `সুপার এজেন্ট আপনার ৳${amount.toLocaleString()} রিফিল সফলভাবে এপ্রুভ করেছেন। ওয়ালেটে ফান্ড জমা হয়েছে।`,
-                  messageEn: `The Super Agent verified and approved your refill of ৳${amount.toLocaleString()}. Credits has landed.`,
-                  timestamp: new Date().toISOString(),
-                  isRead: false,
-                };
-                setNotifications((prev) => {
-                  const updated = [addedNotif, ...prev];
-                  localStorage.setItem('agent_pay_notifications', JSON.stringify(updated));
-                  return updated;
-                });
-              }
-            }).catch((e) => console.error("Error approving refill request:", e));
+            const addedNotif: AppNotification = {
+              id: `notif_${Date.now()}`,
+              titleBn: 'আপনার রিফিল অনুরোধ এপ্রুভ হয়েছে!',
+              titleEn: 'Merchant Wallet Refill Approved!',
+              messageBn: `সুপার এজেন্ট আপনার ৳${amount.toLocaleString()} রিফিল সফলভাবে এপ্রুভ করেছেন। ওয়ালেটে ফান্ড জমা হয়েছে।`,
+              messageEn: `The Super Agent verified and approved your refill of ৳${amount.toLocaleString()}. Credits has landed.`,
+              timestamp: new Date().toISOString(),
+              isRead: false,
+            };
+            setNotifications((prev) => {
+              const updated = [addedNotif, ...prev];
+              localStorage.setItem('agent_pay_notifications', JSON.stringify(updated));
+              return updated;
+            });
           }
         }}
         onClose={() => {
@@ -1713,6 +1790,33 @@ export default function App() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Countdown Timer Widget for Next Withdrawal Request */}
+                  {nextWithdrawCountdown && (
+                    <div className="bg-amber-500/5 border border-amber-500/20 text-amber-300 px-5 py-4 rounded-3xl flex items-center justify-between text-xs font-bold font-sans relative overflow-hidden shadow-md my-1 text-left">
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-xl pointer-events-none" />
+                      <div className="flex items-center gap-2.5 relative z-10">
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                        </span>
+                        <div className="text-left leading-relaxed">
+                          <span className="block text-slate-100 font-extrabold text-sm">
+                            {currentLang === 'bn' ? 'স্বয়ংক্রিয় উইথড্র অনুরোধের সময়সূচী' : 'Automatic Withdraw Scheduled'}
+                          </span>
+                          <span className="block text-[10px] text-amber-400/85 font-medium mt-0.5">
+                            {currentLang === 'bn' 
+                              ? 'একটি সফল এপ্রুভালের পর ১-৩ মিনিটের মধ্যে নতুন অনুরোধ স্বয়ংক্রিয়ভাবে প্রবেশ করবে।' 
+                              : 'After approval, a new withdraw request arrives automatically in 1-3 mins.'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-xl font-mono text-base font-black text-amber-400 shadow-inner shrink-0 relative z-10 flex items-center gap-1.5">
+                        <span className="text-xs">⏱️</span>
+                        <span>{nextWithdrawCountdown}</span>
+                      </div>
+                    </div>
+                  )}
 
                   <RequestList
                     currentLang={currentLang}

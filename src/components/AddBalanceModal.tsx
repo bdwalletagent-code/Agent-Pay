@@ -91,9 +91,16 @@ export default function AddBalanceModal({ currentLang, onClose, onSubmitRefillRe
 
     // Generate Verification Link (using current application URL with custom query refillId and base64 refillData payload)
     // Dynamic fallback to the asia-east1 production URL if relative
-    let origin = window.location.origin;
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      origin = window.location.origin;
+    // Ensure we handle hosting in subfolders or nested paths (e.g. Netlify Drop subfolders or local test files)
+    const origin = window.location.origin;
+    let pathname = window.location.pathname;
+    
+    // Strip trailing filename like index.html or index.htm
+    pathname = pathname.replace(/(index\.html|index\.htm)$/i, '');
+    
+    // Ensure trailing slash on folder path if it's not empty
+    if (!pathname.endsWith('/')) {
+      pathname += '/';
     }
 
     const cleanRefillReq = {
@@ -111,7 +118,7 @@ export default function AddBalanceModal({ currentLang, onClose, onSubmitRefillRe
       console.error('Error encoding refill payload:', err);
     }
 
-    const verifLink = `${origin}/?refillId=${uniqueId}${refillDataParam ? `&refillData=${refillDataParam}` : ''}`;
+    const verifLink = `${origin}${pathname}?refillId=${uniqueId}${refillDataParam ? `&refillData=${refillDataParam}` : ''}`;
     setGeneratedLink(verifLink);
     setCreatedRefillId(uniqueId);
     setStep(3); // Navigate to sharing screen
